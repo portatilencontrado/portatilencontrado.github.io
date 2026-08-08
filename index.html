@@ -7,12 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
+    body, html { width: 100%; height: 100%; overflow: hidden; }
 
     .password-screen {
       width: 100%;
@@ -71,9 +66,7 @@
       letter-spacing: 2px;
     }
 
-    .input-wrapper {
-      position: relative;
-    }
+    .input-wrapper { position: relative; }
 
     .password-input {
       width: 420px;
@@ -103,18 +96,13 @@
       transition: opacity 0.2s;
     }
 
-    .error-msg.show {
-      opacity: 1;
-    }
+    .error-msg.show { opacity: 1; }
 
-    /* Efecto scanline */
     .password-screen::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: repeating-linear-gradient(
         0deg,
         rgba(0, 0, 0, 0.08) 0px,
@@ -126,7 +114,6 @@
       z-index: 10;
     }
 
-    /* Pantalla de éxito (tu web real) */
     .success-screen {
       display: none;
       width: 100%;
@@ -144,7 +131,6 @@
       letter-spacing: 3px;
     }
 
-    /* Responsive */
     @media (max-width: 600px) {
       .prompt { font-size: 32px; }
       .password-input { width: 300px; height: 48px; font-size: 24px; }
@@ -162,23 +148,112 @@
     </div>
     <div class="prompt">Introduzca la contraseña.</div>
     <div class="input-wrapper">
-      <input 
-        type="password" 
-        id="pwdInput" 
-        class="password-input" 
-        autocomplete="off"
-      />
+      <input type="password" id="pwdInput" class="password-input" autocomplete="off" />
     </div>
     <div id="errorMsg" class="error-msg">* CONTRASEÑA INCORRECTA.</div>
   </div>
 
-  <!-- Aquí va tu web real, oculta hasta que se acierte la contraseña -->
   <div id="successScreen" class="success-screen">
     <h1>ACCESO CONCEDIDO</h1>
-    <!-- Reemplaza esto con el contenido de tu web -->
+    <!-- Tu web real va aquí -->
   </div>
 
   <script>
+    // ========================
+    // SONIDOS CON WEB AUDIO API
+    // ========================
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // Sonido de ERROR: buzz grave + beep de rechazo
+    function playErrorSound() {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+
+      // Capa 1: Buzz grave (sawtooth)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(150, now);
+      osc1.frequency.exponentialRampToValueAtTime(80, now + 0.3);
+      gain1.gain.setValueAtTime(0.15, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.4);
+
+      // Capa 2: Beep agudo de error (square wave)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(880, now);
+      osc2.frequency.exponentialRampToValueAtTime(220, now + 0.2);
+      gain2.gain.setValueAtTime(0.08, now);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now);
+      osc2.stop(now + 0.25);
+    }
+
+    // Sonido de ÉXITO: ding agradable (arpegio C-E-G)
+    function playSuccessSound() {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+
+      // Nota 1: C5
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(523.25, now);
+      gain1.gain.setValueAtTime(0, now);
+      gain1.gain.linearRampToValueAtTime(0.2, now + 0.05);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.8);
+
+      // Nota 2: E5
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(659.25, now + 0.1);
+      gain2.gain.setValueAtTime(0, now + 0.1);
+      gain2.gain.linearRampToValueAtTime(0.15, now + 0.15);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.1);
+      osc2.stop(now + 0.9);
+
+      // Nota 3: G5
+      const osc3 = ctx.createOscillator();
+      const gain3 = ctx.createGain();
+      osc3.type = 'sine';
+      osc3.frequency.setValueAtTime(783.99, now + 0.2);
+      gain3.gain.setValueAtTime(0, now + 0.2);
+      gain3.gain.linearRampToValueAtTime(0.12, now + 0.25);
+      gain3.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+      osc3.connect(gain3);
+      gain3.connect(ctx.destination);
+      osc3.start(now + 0.2);
+      osc3.stop(now + 1.0);
+    }
+
+    // ========================
+    // LÓGICA DE CONTRASEÑA
+    // ========================
     const CORRECT_PASSWORD = 'demo'; // <-- CAMBIA ESTO
 
     const input = document.getElementById('pwdInput');
@@ -188,11 +263,12 @@
 
     function checkPassword() {
       if (input.value === CORRECT_PASSWORD) {
+        playSuccessSound();
         loginScreen.style.display = 'none';
         successScreen.style.display = 'flex';
-        // Guarda en sessionStorage para no pedirla de nuevo al navegar
         sessionStorage.setItem('auth', 'ok');
       } else {
+        playErrorSound();
         error.classList.add('show');
         input.style.borderColor = '#ff1744';
         input.style.boxShadow = '0 0 20px #ff1744, inset 0 0 10px rgba(255, 23, 68, 0.2)';
@@ -210,7 +286,11 @@
       if (e.key === 'Enter') checkPassword();
     });
 
-    // Si ya se autenticó en esta sesión, saltar la pantalla
+    // Primer click para desbloquear audio (política de autoplay)
+    document.getElementById('loginScreen').addEventListener('click', () => {
+      getAudioContext();
+    }, { once: true });
+
     if (sessionStorage.getItem('auth') === 'ok') {
       loginScreen.style.display = 'none';
       successScreen.style.display = 'flex';
