@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .password-screen {
+      width: 100%;
+      height: 100vh;
+      background-color: #0a0e3e;
+      background-image: 
+        linear-gradient(30deg, #1a237e 12%, transparent 12.5%, transparent 87%, #1a237e 87.5%, #1a237e),
+        linear-gradient(150deg, #1a237e 12%, transparent 12.5%, transparent 87%, #1a237e 87.5%, #1a237e),
+        linear-gradient(30deg, #1a237e 12%, transparent 12.5%, transparent 87%, #1a237e 87.5%, #1a237e),
+        linear-gradient(150deg, #1a237e 12%, transparent 12.5%, transparent 87%, #1a237e 87.5%, #1a237e),
+        linear-gradient(60deg, #1a237e77 25%, transparent 25.5%, transparent 75%, #1a237e77 75%, #1a237e77),
+        linear-gradient(60deg, #1a237e77 25%, transparent 25.5%, transparent 75%, #1a237e77 75%, #1a237e77);
+      background-size: 40px 70px;
+      background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'VT323', monospace;
+      position: relative;
+    }
+
+    .header {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-circle {
+      width: 44px;
+      height: 44px;
+      background: #9e9e9e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .username {
+      font-size: 42px;
+      color: #e0e0e0;
+      letter-spacing: 2px;
+    }
+
+    .prompt {
+      font-size: 48px;
+      color: #e0e0e0;
+      margin-bottom: 48px;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .password-input {
+      width: 420px;
+      height: 56px;
+      background: #f5f5f5;
+      border: 4px solid #9c27b0;
+      box-shadow: 0 0 20px #9c27b0, inset 0 0 10px rgba(156, 39, 176, 0.2);
+      font-family: 'VT323', monospace;
+      font-size: 32px;
+      padding: 0 16px;
+      color: #333;
+      outline: none;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+
+    .password-input:focus {
+      box-shadow: 0 0 30px #9c27b0, 0 0 60px rgba(156, 39, 176, 0.4), inset 0 0 10px rgba(156, 39, 176, 0.2);
+    }
+
+    .error-msg {
+      margin-top: 24px;
+      font-size: 28px;
+      color: #ff1744;
+      letter-spacing: 3px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .error-msg.show {
+      opacity: 1;
+    }
+
+    /* Efecto scanline */
+    .password-screen::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.08) 0px,
+        rgba(0, 0, 0, 0.08) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Pantalla de éxito (tu web real) */
+    .success-screen {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0a0e3e;
+      font-family: 'VT323', monospace;
+    }
+
+    .success-screen h1 {
+      color: #00e676;
+      font-size: 48px;
+      letter-spacing: 3px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .prompt { font-size: 32px; }
+      .password-input { width: 300px; height: 48px; font-size: 24px; }
+      .username { font-size: 32px; }
+      .icon-circle { width: 36px; height: 36px; font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginScreen" class="password-screen">
+    <div class="header">
+      <div class="icon-circle">?</div>
+      <div class="username">Invitado</div>
+    </div>
+    <div class="prompt">Introduzca la contraseña.</div>
+    <div class="input-wrapper">
+      <input 
+        type="password" 
+        id="pwdInput" 
+        class="password-input" 
+        autocomplete="off"
+      />
+    </div>
+    <div id="errorMsg" class="error-msg">* CONTRASEÑA INCORRECTA.</div>
+  </div>
+
+  <!-- Aquí va tu web real, oculta hasta que se acierte la contraseña -->
+  <div id="successScreen" class="success-screen">
+    <h1>ACCESO CONCEDIDO</h1>
+    <!-- Reemplaza esto con el contenido de tu web -->
+  </div>
+
+  <script>
+    const CORRECT_PASSWORD = 'demo'; // <-- CAMBIA ESTO
+
+    const input = document.getElementById('pwdInput');
+    const error = document.getElementById('errorMsg');
+    const loginScreen = document.getElementById('loginScreen');
+    const successScreen = document.getElementById('successScreen');
+
+    function checkPassword() {
+      if (input.value === CORRECT_PASSWORD) {
+        loginScreen.style.display = 'none';
+        successScreen.style.display = 'flex';
+        // Guarda en sessionStorage para no pedirla de nuevo al navegar
+        sessionStorage.setItem('auth', 'ok');
+      } else {
+        error.classList.add('show');
+        input.style.borderColor = '#ff1744';
+        input.style.boxShadow = '0 0 20px #ff1744, inset 0 0 10px rgba(255, 23, 68, 0.2)';
+        setTimeout(() => {
+          error.classList.remove('show');
+          input.style.borderColor = '#9c27b0';
+          input.style.boxShadow = '0 0 20px #9c27b0, inset 0 0 10px rgba(156, 39, 176, 0.2)';
+          input.value = '';
+          input.focus();
+        }, 2000);
+      }
+    }
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkPassword();
+    });
+
+    // Si ya se autenticó en esta sesión, saltar la pantalla
+    if (sessionStorage.getItem('auth') === 'ok') {
+      loginScreen.style.display = 'none';
+      successScreen.style.display = 'flex';
+    }
+
+    input.focus();
+  </script>
+
+</body>
+</html>
