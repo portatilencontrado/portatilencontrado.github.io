@@ -9,7 +9,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body, html { width: 100%; height: 100%; overflow: hidden; }
 
-    .password-screen {
+    .screen {
       width: 100%;
       height: 100vh;
       background-color: #0a0e3e;
@@ -22,12 +22,31 @@
         linear-gradient(60deg, #1a237e77 25%, transparent 25.5%, transparent 75%, #1a237e77 75%, #1a237e77);
       background-size: 40px 70px;
       background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px;
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       font-family: 'VT323', monospace;
       position: relative;
+      overflow: hidden;
+    }
+
+    .screen.active { display: flex; }
+
+    .screen::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.08) 0px,
+        rgba(0, 0, 0, 0.08) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: 10;
     }
 
     .header {
@@ -40,8 +59,7 @@
     }
 
     .icon-circle {
-      width: 44px;
-      height: 44px;
+      width: 44px; height: 44px;
       background: #9e9e9e;
       border-radius: 50%;
       display: flex;
@@ -52,11 +70,7 @@
       font-weight: bold;
     }
 
-    .username {
-      font-size: 42px;
-      color: #e0e0e0;
-      letter-spacing: 2px;
-    }
+    .username { font-size: 42px; color: #e0e0e0; letter-spacing: 2px; }
 
     .prompt {
       font-size: 48px;
@@ -66,11 +80,8 @@
       letter-spacing: 2px;
     }
 
-    .input-wrapper { position: relative; }
-
     .password-input {
-      width: 420px;
-      height: 56px;
+      width: 420px; height: 56px;
       background: #f5f5f5;
       border: 4px solid #9c27b0;
       box-shadow: 0 0 20px #9c27b0, inset 0 0 10px rgba(156, 39, 176, 0.2);
@@ -98,31 +109,57 @@
 
     .error-msg.show { opacity: 1; }
 
-    .password-screen::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.08) 0px,
-        rgba(0, 0, 0, 0.08) 1px,
-        transparent 1px,
-        transparent 2px
-      );
-      pointer-events: none;
-      z-index: 10;
+    .image-screen img {
+      max-width: 80%;
+      max-height: 70vh;
+      border: 4px solid #9c27b0;
+      box-shadow: 0 0 40px rgba(156, 39, 176, 0.5);
+      z-index: 5;
     }
 
-    .success-screen {
-      display: none;
-      width: 100%;
-      height: 100vh;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #0a0e3e;
+    .image-screen .title {
+      font-size: 36px;
+      color: #00e676;
+      margin-bottom: 24px;
+      letter-spacing: 3px;
+      z-index: 5;
+    }
+
+    .video-screen video {
+      max-width: 85%;
+      max-height: 75vh;
+      border: 4px solid #ff1744;
+      box-shadow: 0 0 40px rgba(255, 23, 68, 0.5);
+      z-index: 5;
+    }
+
+    .video-screen .title {
+      font-size: 36px;
+      color: #ff1744;
+      margin-bottom: 24px;
+      letter-spacing: 3px;
+      z-index: 5;
+    }
+
+    .return-btn {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 28px;
+      background: #9c27b0;
+      border: 3px solid #ce93d8;
+      color: #fff;
       font-family: 'VT323', monospace;
+      font-size: 24px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      z-index: 20;
+      transition: all 0.2s;
+    }
+
+    .return-btn:hover {
+      background: #7b1fa2;
+      box-shadow: 0 0 20px #9c27b0;
     }
 
     .success-screen h1 {
@@ -131,17 +168,25 @@
       letter-spacing: 3px;
     }
 
+    .success-screen p {
+      color: #e0e0e0;
+      font-size: 24px;
+      margin-top: 16px;
+    }
+
     @media (max-width: 600px) {
       .prompt { font-size: 32px; }
       .password-input { width: 300px; height: 48px; font-size: 24px; }
       .username { font-size: 32px; }
       .icon-circle { width: 36px; height: 36px; font-size: 22px; }
+      .return-btn { font-size: 18px; padding: 10px 20px; }
+      .image-screen img, .video-screen video { max-width: 95%; }
     }
   </style>
 </head>
 <body>
 
-  <div id="loginScreen" class="password-screen">
+  <div id="loginScreen" class="screen active">
     <div class="header">
       <div class="icon-circle">?</div>
       <div class="username">Invitado</div>
@@ -153,31 +198,79 @@
     <div id="errorMsg" class="error-msg">* CONTRASEÑA INCORRECTA.</div>
   </div>
 
-  <div id="successScreen" class="success-screen">
+  <div id="c3osoScreen" class="screen image-screen">
+    <div class="title">CEREBRO SOS</div>
+    <img src="cerebrosos.png" alt="cerebrosos" />
+    <button class="return-btn" onclick="goBack()">↩ RETORNAR</button>
+  </div>
+
+  <div id="f164rScreen" class="screen image-screen">
+    <div class="title">BOSQUE</div>
+    <img src="bosque.png" alt="bosque" />
+    <button class="return-btn" onclick="goBack()">↩ RETORNAR</button>
+  </div>
+
+  <div id="sol4rScreen" class="screen video-screen">
+    <div class="title">ACCESO DENEGADO</div>
+    <video id="deniedVideo" controls autoplay playsinline>
+      <source src="accesodenegado.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div id="successScreen" class="screen success-screen">
     <h1>ACCESO CONCEDIDO</h1>
-    <!-- Tu web real va aquí -->
+    <p>Bienvenido a la web principal.</p>
   </div>
 
   <script>
-    const CORRECT_PASSWORD = 'demo'; // <-- CAMBIA ESTO
-
     const input = document.getElementById('pwdInput');
     const error = document.getElementById('errorMsg');
     const loginScreen = document.getElementById('loginScreen');
+    const c3osoScreen = document.getElementById('c3osoScreen');
+    const f164rScreen = document.getElementById('f164rScreen');
+    const sol4rScreen = document.getElementById('sol4rScreen');
     const successScreen = document.getElementById('successScreen');
+    const deniedVideo = document.getElementById('deniedVideo');
 
-    // Sonido de error con tu archivo wrong.mp3
+    const SCREENS = [loginScreen, c3osoScreen, f164rScreen, sol4rScreen, successScreen];
+
+    function hideAll() {
+      SCREENS.forEach(s => s.classList.remove('active'));
+    }
+
+    function showScreen(screen) {
+      hideAll();
+      screen.classList.add('active');
+    }
+
     function playErrorSound() {
       const audio = new Audio('wrong.mp3');
       audio.volume = 0.5;
       audio.play().catch(() => {});
     }
 
+    function goBack() {
+      input.value = '';
+      error.classList.remove('show');
+      input.style.borderColor = '#9c27b0';
+      input.style.boxShadow = '0 0 20px #9c27b0, inset 0 0 10px rgba(156, 39, 176, 0.2)';
+      showScreen(loginScreen);
+      input.focus();
+    }
+
     function checkPassword() {
-      if (input.value === CORRECT_PASSWORD) {
-        // Éxito: sin sonido
-        loginScreen.style.display = 'none';
-        successScreen.style.display = 'flex';
+      const val = input.value;
+
+      if (val === 'C3OSO') {
+        showScreen(c3osoScreen);
+      } else if (val === 'F164R') {
+        showScreen(f164rScreen);
+      } else if (val === 'SOL4R') {
+        showScreen(sol4rScreen);
+        deniedVideo.currentTime = 0;
+        deniedVideo.play().catch(() => {});
+      } else if (val === 'demo') {
+        showScreen(successScreen);
         sessionStorage.setItem('auth', 'ok');
       } else {
         playErrorSound();
@@ -198,10 +291,13 @@
       if (e.key === 'Enter') checkPassword();
     });
 
-    if (sessionStorage.getItem('auth') === 'ok') {
-      loginScreen.style.display = 'none';
-      successScreen.style.display = 'flex';
-    }
+    // Al terminar el video: pantalla negra total
+    deniedVideo.addEventListener('ended', () => {
+      document.body.innerHTML = '';
+      document.body.style.background = '#000';
+      document.body.style.cursor = 'none';
+      document.documentElement.style.background = '#000';
+    });
 
     input.focus();
   </script>
