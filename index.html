@@ -182,7 +182,7 @@
     <div id="errorMsg" class="error-msg">* CONTRASEÑA INCORRECTA.</div>
   </div>
 
-  <div id="c3osoScreen" class="screen image-screen">
+  <div id="c30sbScreen" class="screen image-screen">
     <img src="cerebrosos.png" alt="cerebrosos" />
     <button class="return-btn" onclick="goBack()">↩ RETORNAR</button>
   </div>
@@ -192,7 +192,7 @@
     <button class="return-btn" onclick="goBack()">↩ RETORNAR</button>
   </div>
 
-  <div id="sol4rScreen" class="screen video-screen">
+  <div id="s0l4rScreen" class="screen video-screen">
     <video id="deniedVideo" controls autoplay playsinline>
       <source src="accesodenegado.mp4" type="video/mp4">
     </video>
@@ -207,13 +207,13 @@
     const input = document.getElementById('pwdInput');
     const error = document.getElementById('errorMsg');
     const loginScreen = document.getElementById('loginScreen');
-    const c3osoScreen = document.getElementById('c3osoScreen');
+    const c30sbScreen = document.getElementById('c30sbScreen');
     const f164rScreen = document.getElementById('f164rScreen');
-    const sol4rScreen = document.getElementById('sol4rScreen');
+    const s0l4rScreen = document.getElementById('s0l4rScreen');
     const successScreen = document.getElementById('successScreen');
     const deniedVideo = document.getElementById('deniedVideo');
 
-    const SCREENS = [loginScreen, c3osoScreen, f164rScreen, sol4rScreen, successScreen];
+    const SCREENS = [loginScreen, c30sbScreen, f164rScreen, s0l4rScreen, successScreen];
 
     function hideAll() {
       SCREENS.forEach(s => s.classList.remove('active'));
@@ -243,11 +243,11 @@
       const val = input.value;
 
       if (val === 'C30SB') {
-        showScreen(c3osoScreen);
+        showScreen(c30sbScreen);
       } else if (val === 'F164R') {
         showScreen(f164rScreen);
       } else if (val === 'S0L4R') {
-        showScreen(sol4rScreen);
+        showScreen(s0l4rScreen);
         deniedVideo.currentTime = 0;
         deniedVideo.play().catch(() => {});
       } else if (val === 'demo') {
@@ -272,11 +272,9 @@
       if (e.key === 'Enter') checkPassword();
     });
 
+    // Al terminar el video: vuelve automáticamente al login
     deniedVideo.addEventListener('ended', () => {
-      document.body.innerHTML = '';
-      document.body.style.background = '#000';
-      document.body.style.cursor = 'none';
-      document.documentElement.style.background = '#000';
+      goBack();
     });
 
     input.focus();
