@@ -7,11 +7,15 @@
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body, html { width: 100%; height: 100%; overflow: hidden; }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+    }
 
     .screen {
       width: 100%;
-      height: 100vh;
+      min-height: 100vh;
       background-color: #0a0e3e;
       background-image: 
         linear-gradient(30deg, #1a237e 12%, transparent 12.5%, transparent 87%, #1a237e 87.5%, #1a237e),
@@ -35,7 +39,7 @@
 
     .screen::after {
       content: '';
-      position: absolute;
+      position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: repeating-linear-gradient(
@@ -49,6 +53,7 @@
       z-index: 10;
     }
 
+    /* LOGIN */
     .header {
       position: absolute;
       top: 24px;
@@ -109,14 +114,21 @@
 
     .error-msg.show { opacity: 1; }
 
-    .image-screen img {
-      max-width: 80%;
-      max-height: 70vh;
-      border: 4px solid #9c27b0;
-      box-shadow: 0 0 40px rgba(156, 39, 176, 0.5);
-      z-index: 5;
+    /* PANTALLAS DE IMAGEN - PANTALLA COMPLETA CON SCROLL */
+    .image-screen {
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding: 0;
     }
 
+    .image-screen img {
+      width: 100vw;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* PANTALLA DE VIDEO */
     .video-screen video {
       max-width: 85%;
       max-height: 75vh;
@@ -125,8 +137,9 @@
       z-index: 5;
     }
 
+    /* BOTÓN RETORNAR - FIJO AL HACER SCROLL */
     .return-btn {
-      position: absolute;
+      position: fixed;
       bottom: 24px;
       right: 24px;
       padding: 12px 28px;
@@ -137,7 +150,7 @@
       font-size: 24px;
       cursor: pointer;
       letter-spacing: 2px;
-      z-index: 20;
+      z-index: 30;
       transition: all 0.2s;
     }
 
@@ -146,6 +159,7 @@
       box-shadow: 0 0 20px #9c27b0;
     }
 
+    /* SUCCESS */
     .success-screen h1 {
       color: #00e676;
       font-size: 48px;
@@ -164,7 +178,7 @@
       .username { font-size: 32px; }
       .icon-circle { width: 36px; height: 36px; font-size: 22px; }
       .return-btn { font-size: 18px; padding: 10px 20px; }
-      .image-screen img, .video-screen video { max-width: 95%; }
+      .video-screen video { max-width: 95%; }
     }
   </style>
 </head>
@@ -217,6 +231,7 @@
 
     function hideAll() {
       SCREENS.forEach(s => s.classList.remove('active'));
+      window.scrollTo(0, 0);
     }
 
     function showScreen(screen) {
@@ -272,7 +287,6 @@
       if (e.key === 'Enter') checkPassword();
     });
 
-    // Al terminar el video: vuelve automáticamente al login
     deniedVideo.addEventListener('ended', () => {
       goBack();
     });
